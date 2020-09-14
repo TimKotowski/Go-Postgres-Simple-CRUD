@@ -29,7 +29,7 @@ func init() {
 	if err = db.Ping(); err != nil {
 		panic(err)
 	}
-	fmt.Println("you connected to the database")
+	fmt.Println("you're connected to the database")
 }
 
 func main() {
