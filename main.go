@@ -21,7 +21,6 @@ var db *sql.DB
 
 func init() {
 	var err error
-
 	db, err = sql.Open("postgres", "postgres://postgres:password@localhost/bookstore?sslmode=disable")
 	if err != nil {
 		panic(err)
@@ -39,6 +38,10 @@ func main() {
 }
 
 func booksIndex(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, http.StatusText(500), 500)
+	}
+
 	selectBooks := "SELECT * FROM books;"
 	rows, err := db.Query(selectBooks)
 	if err != nil {
@@ -53,13 +56,15 @@ func booksIndex(w http.ResponseWriter, r *http.Request) {
 		bk := Book{}
 		err := rows.Scan(&bk.isbn, &bk.title, &bk.author, &bk.price) // order matters
 		if err != nil {
-			panic(err)
+			http.Error(w, http.StatusText(500), 500)
+			return
 		}
 		bks = append(bks, bk)
 	}
 
 	if err = rows.Err(); err != nil {
-		panic(err)
+		http.Error(w, http.StatusText(500), 500)
+		return
 	}
 
 	for _, bk := range bks {
